@@ -26,6 +26,8 @@
     --red: #ff1744;
     --red-g: rgba(255, 23, 68, 0.25);
     --green: #00e639;
+    --purple: #7c4dff;
+    --accent: #D18FFF;
     --mono: 'JetBrains Mono', monospace;
 }
 
@@ -75,18 +77,11 @@ body::before {
     background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, .04) 2px, rgba(0, 0, 0, .04) 4px);
 }
 
-/* ===== МЕРЦАЮЩИЕ ПОЛОСКИ-ЗВЁЗДЫ (как на 123132123123123t) ===== */
-@keyframes twinkleLine {
-    0%, 100% {
-        opacity: 0.1;
-        transform: scaleY(0.6);
-    }
-    50% {
-        opacity: 1;
-        transform: scaleY(1.2);
-    }
+/* ===== МЕРЦАЮЩИЕ ЗВЁЗДЫ ===== */
+@keyframes twinkle {
+    0%, 100% { opacity: 0.15; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.3); }
 }
-
 .star-field {
     position: fixed;
     inset: 0;
@@ -94,15 +89,12 @@ body::before {
     pointer-events: none;
     overflow: hidden;
 }
-
 .star-field span {
     position: absolute;
-    display: block;
-    background: linear-gradient(to bottom, transparent, var(--red), transparent);
-    border-radius: 2px;
-    box-shadow: 0 0 6px var(--red), 0 0 12px var(--red-g);
-    animation: twinkleLine 3s ease-in-out infinite;
-    transform-origin: center;
+    border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red), 0 0 16px var(--red-g);
+    animation: twinkle 3s ease-in-out infinite;
 }
 
 #stars-canvas {
@@ -157,6 +149,18 @@ body::before {
     66% { transform: translate(-40px, 50px) scale(0.9); }
 }
 
+.cursor-glow {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255, 23, 68, 0.04) 0%, rgba(255, 23, 68, 0.02) 40%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s, transform 0.1s ease-out;
+}
+
 .container {
     position: relative;
     z-index: 2;
@@ -165,6 +169,7 @@ body::before {
     padding: 0 24px 80px;
 }
 
+/* ===== HEADER ===== */
 .header {
     display: flex;
     justify-content: space-between;
@@ -247,6 +252,27 @@ body::before {
     box-shadow: 0 0 50px rgba(255, 23, 68, .3);
 }
 
+.btn-outline {
+    padding: 10px 24px;
+    border-radius: 40px;
+    border: 1px solid rgba(255, 23, 68, .2);
+    background: transparent;
+    color: #fff;
+    font-weight: 600;
+    font-family: var(--mono);
+    transition: .3s;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-outline:hover {
+    background: rgba(255, 23, 68, .08);
+    border-color: var(--red);
+    box-shadow: 0 0 20px rgba(255, 23, 68, .08);
+}
+
+/* ===== HERO ===== */
 .hero {
     display: flex;
     flex-direction: column;
@@ -398,6 +424,7 @@ body::before {
     100% { opacity: 0; transform: translateX(-50%) translateY(14px); }
 }
 
+/* ===== STATS ===== */
 .stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -441,6 +468,7 @@ body::before {
     margin-top: 6px;
 }
 
+/* ===== FEATURES ===== */
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -482,6 +510,7 @@ body::before {
     color: var(--dim);
 }
 
+/* ===== SECTIONS ===== */
 .section {
     padding: 80px 0 40px;
     position: relative;
@@ -515,12 +544,13 @@ body::before {
 }
 
 .section-title .gradient {
-    background: linear-gradient(135deg, var(--red), #D18FFF);
+    background: linear-gradient(135deg, var(--red), var(--accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
+/* ===== PRICING ===== */
 .price-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -616,6 +646,7 @@ body::before {
     white-space: nowrap;
 }
 
+/* ===== CTA ===== */
 .cta-block {
     background: var(--card);
     border: 1px solid var(--border);
@@ -645,6 +676,7 @@ body::before {
     font-size: 16px;
 }
 
+/* ===== FOOTER ===== */
 .footer {
     padding: 24px 0;
     border-top: 1px solid var(--border);
@@ -669,10 +701,761 @@ body::before {
     color: var(--red);
 }
 
+/* ===== UPGRADE: градиентные рамки, tilt, marquee, faq ===== */
+@property --ga {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+@keyframes gradSpin {
+    to { --ga: 360deg; }
+}
+.grad-border {
+    position: relative;
+}
+.grad-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--ga), transparent 0%, rgba(255,23,68,.6) 12%, transparent 25%, transparent 50%, rgba(209,143,255,.5) 62%, transparent 75%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: gradSpin 6s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes floatY {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+.float-anim {
+    animation: floatY 6s ease-in-out infinite;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+@keyframes marquee {
+    to { transform: translateX(-50%); }
+}
+.marquee-wrap {
+    overflow: hidden;
+    position: relative;
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+    -webkit-mask: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    mask: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.marquee-track {
+    display: flex;
+    gap: 12px;
+    width: max-content;
+    animation: marquee 30s linear infinite;
+}
+.marquee-wrap:hover .marquee-track {
+    animation-play-state: paused;
+}
+.marquee-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 99px;
+    background: rgba(12, 12, 20, .8);
+    border: 1px solid rgba(255, 23, 68, .15);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--mono);
+    white-space: nowrap;
+}
+.marquee-chip::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+}
+
+.faq-item {
+    background: var(--card);
+    border: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: .3s;
+}
+.faq-item:hover {
+    border-color: rgba(255, 23, 68, .2);
+}
+.faq-q {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 26px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--mono);
+    cursor: pointer;
+    text-align: left;
+}
+.faq-q .plus {
+    color: var(--red);
+    font-size: 20px;
+    transition: transform .3s;
+    flex-shrink: 0;
+}
+.faq-item.open .plus {
+    transform: rotate(45deg);
+}
+.faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .4s cubic-bezier(.4, 0, .2, 1);
+}
+.faq-a p {
+    padding: 0 26px 22px;
+    color: var(--dim);
+    font-size: 14px;
+    font-family: var(--mono);
+    line-height: 1.8;
+}
+.faq-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 820px;
+    margin: 0 auto;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+.step-card {
+    position: relative;
+    background: var(--card);
+    border: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 20px;
+    padding: 36px 28px;
+    overflow: hidden;
+    transition: .4s;
+}
+.step-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 23, 68, .25);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .4);
+}
+.step-num {
+    font-size: 56px;
+    font-weight: 800;
+    font-family: var(--mono);
+    background: linear-gradient(135deg, var(--red), transparent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 18px;
+}
+.step-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+    font-family: var(--mono);
+}
+.step-card p {
+    color: var(--dim);
+    font-size: 13px;
+    font-family: var(--mono);
+    line-height: 1.7;
+}
+
+/* ===== HERO PANEL ===== */
+.hero-inner {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.hero-panel {
+    position: relative;
+    padding: clamp(28px, 3.2vw, 44px) clamp(26px, 3vw, 40px);
+    border-radius: 18px;
+    background: linear-gradient(160deg, rgba(26, 19, 40, 0.08) 0%, rgba(14, 10, 22, 0.03) 100%);
+    border: 1px solid rgba(255, 23, 68, 0.2);
+    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 1px 0 rgba(255, 255, 255, 0.15) inset, inset 0 0 30px rgba(255, 23, 68, 0.08);
+    overflow: hidden;
+    width: 100%;
+    max-width: 1120px;
+}
+.hero-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 23, 68, 0.55), transparent);
+    pointer-events: none;
+}
+.hero-panel::after {
+    content: '';
+    position: absolute;
+    top: -60%;
+    right: -20%;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 23, 68, 0.15), transparent 65%);
+    pointer-events: none;
+    filter: blur(20px);
+    z-index: 0;
+}
+.hero-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== ACCOUNT PANEL ===== */
+.account-panel {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 400px;
+    height: 100vh;
+    background: rgba(8, 8, 12, 0.98);
+    backdrop-filter: blur(30px);
+    border-left: 1px solid rgba(255, 23, 68, 0.15);
+    z-index: 10002;
+    transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -20px 0 60px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+}
+.account-panel.open {
+    right: 0;
+}
+.account-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+.account-panel-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+}
+.account-panel-header h2 span {
+    color: var(--red);
+}
+.account-close {
+    background: none;
+    border: none;
+    color: var(--dim);
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    padding: 4px 8px;
+    font-family: var(--mono);
+    position: relative;
+    z-index: 2;
+}
+.account-close:hover {
+    color: var(--red);
+    transform: rotate(90deg);
+}
+.account-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 28px 20px;
+    position: relative;
+    z-index: 1;
+}
+
+#account-stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+#account-stars canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.account-avatar-wrapper {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.account-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    font-weight: 800;
+    color: #fff;
+    box-shadow: 0 0 40px rgba(255, 23, 68, 0.15), inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+    position: relative;
+    cursor: pointer;
+    transition: 0.3s;
+    background: linear-gradient(135deg, var(--red), rgba(255, 23, 68, 0.3));
+}
+.account-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 60px rgba(255, 23, 68, 0.25);
+}
+.account-avatar .change-avatar-hint {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--dim);
+    transition: 0.3s;
+}
+.account-avatar:hover .change-avatar-hint {
+    background: rgba(255, 23, 68, 0.1);
+    border-color: var(--red);
+    color: var(--red);
+}
+.account-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.account-name {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 2;
+}
+.account-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 18px 0 24px;
+    position: relative;
+    z-index: 2;
+}
+.account-stat {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition: 0.3s;
+}
+.account-stat:hover {
+    border-color: rgba(255, 23, 68, 0.15);
+}
+.account-stat .num {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dim);
+    font-family: var(--mono);
+}
+.account-stat .num.active {
+    color: var(--red);
+}
+.account-stat .label {
+    font-size: 9px;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-family: var(--mono);
+    margin-top: 4px;
+    display: block;
+}
+
+.account-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.04);
+    margin: 16px 0 20px;
+    position: relative;
+    z-index: 2;
+}
+.account-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    position: relative;
+    z-index: 2;
+}
+.account-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: var(--text);
+    text-decoration: none;
+    transition: 0.3s;
+    font-family: var(--mono);
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+.account-menu-item:hover {
+    background: rgba(255, 23, 68, 0.05);
+    color: #fff;
+}
+.account-menu-item .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dim);
+    transition: 0.3s;
+    font-size: 14px;
+}
+.account-menu-item:hover .icon {
+    background: rgba(255, 23, 68, 0.08);
+    color: var(--red);
+}
+.account-menu-item .arrow {
+    color: var(--dim);
+    margin-left: auto;
+    font-size: 11px;
+    transition: 0.3s;
+}
+.account-menu-item:hover .arrow {
+    color: var(--red);
+    transform: translateX(3px);
+}
+.account-menu-item.danger {
+    color: var(--red);
+}
+.account-menu-item.danger:hover {
+    background: rgba(255, 23, 68, 0.06);
+}
+.account-menu-item.danger .icon {
+    color: var(--red);
+}
+.account-footer {
+    padding: 14px 28px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 11px;
+    color: var(--dim);
+    text-align: center;
+    flex-shrink: 0;
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ===== REGISTER MODAL ===== */
+.register-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .85);
+    backdrop-filter: blur(12px);
+    z-index: 10001;
+    align-items: center;
+    justify-content: center;
+}
+.register-modal .modal-content {
+    background: linear-gradient(160deg, rgba(26, 19, 40, 0.08) 0%, rgba(14, 10, 22, 0.03) 100%);
+    border: 1px solid rgba(255, 23, 68, 0.25);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06) inset, 0 1px 0 rgba(255, 255, 255, 0.1) inset, inset 0 0 30px rgba(255, 23, 68, 0.06);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.register-modal .modal-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 18px;
+    background: rgba(255, 23, 68, 0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 23, 68, 0.2);
+}
+.register-modal .modal-icon span {
+    font-size: 26px;
+    color: var(--red);
+    font-family: var(--mono);
+    font-weight: 700;
+}
+.register-modal h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 4px;
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+}
+.register-modal .sub {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 13px;
+    margin: 0 0 26px;
+    font-family: var(--mono);
+}
+.register-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-align: left;
+}
+.register-modal label {
+    color: var(--dim);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 5px;
+    font-family: var(--mono);
+}
+.register-modal input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-size: 14px;
+    font-family: var(--mono);
+    outline: none;
+    transition: 0.3s;
+}
+.register-modal input:focus {
+    border-color: rgba(255, 23, 68, 0.3);
+    box-shadow: 0 0 20px rgba(255, 23, 68, 0.05);
+}
+.register-modal .btn-submit {
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--red);
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0 30px var(--red-g);
+    margin-top: 4px;
+}
+.register-modal .btn-submit:hover {
+    background: #e6003b;
+    transform: scale(1.02);
+}
+.register-modal .btn-cancel {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 13px;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: 0.3s;
+}
+.register-modal .btn-cancel:hover {
+    color: rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+#avatarInput {
+    display: none;
+}
+
+/* ===== TOAST ===== */
+.toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(10, 10, 16, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px 24px;
+    border-radius: 16px;
+    z-index: 9999;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 23, 68, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+}
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* ===== CONTACT ===== */
+.contact-grid {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.contact-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 32px;
+    border-radius: 20px;
+    background: var(--card);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    min-width: 320px;
+    backdrop-filter: blur(16px);
+}
+.contact-card:hover {
+    border-color: rgba(255, 23, 68, 0.3);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 23, 68, 0.1);
+    background: rgba(20, 20, 30, 0.8);
+}
+.contact-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s;
+}
+.contact-card:hover .contact-icon {
+    background: rgba(255, 23, 68, 0.1);
+    border-color: var(--red);
+}
+.contact-icon svg {
+    width: 28px;
+    height: 28px;
+    transition: all 0.3s;
+}
+.contact-info .label {
+    font-size: 12px;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+    font-weight: 600;
+    font-family: var(--mono);
+}
+.contact-info .value {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: var(--mono);
+}
+
+/* ===== RESPONSIVE ===== */
 @media(max-width: 1100px) {
     .price-grid {
         grid-template-columns: repeat(2, 1fr);
         max-width: 600px;
+    }
+    .steps {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 768px) {
+    .contact-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    .contact-card {
+        min-width: 100%;
+        padding: 20px;
+    }
+    .account-panel {
+        width: 100%;
+        right: -100%;
     }
 }
 
@@ -699,6 +1482,9 @@ body::before {
     }
     .price-grid {
         grid-template-columns: 1fr;
+    }
+    .cursor-glow {
+        display: none;
     }
 }
 
@@ -727,6 +1513,7 @@ body::before {
 </head>
 <body>
 
+<div class="cursor-glow" id="cursorGlow"></div>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
@@ -742,31 +1529,43 @@ body::before {
         </div>
         <div class="header-nav">
             <a href="#pricing">Тарифы</a>
-            <a href="#">Документация</a>
+            <a href="#faq">FAQ</a>
+            <a href="#contact">Контакты</a>
+            <a href="#" class="btn-outline" onclick="openRegisterModal(event)">Регистрация</a>
+            <a href="#" class="btn-outline" onclick="openAccountPanel(event)">Войти</a>
             <a href="     https://dalink.to/megabozz" target="_blank" class="btn-primary">Приобрести доступ</a>
         </div>
     </header>
 
-    <section class="hero">
-        <div class="status-badge" style="opacity: 1;"><span class="status-dot"></span> ONLINE — ACTIVE STATUS</div>
-        <h1>Достигай большего.<br>Властвуй с <span data-text="MegaBoss.wtf">MegaBoss.wtf</span>.</h1>
-        <p>Премиум HWID SPOOFER для Rust с полным набором функций. Если ты ищешь максимум – ты нашёл его.</p>
-        <div class="hero-buttons">
-            <a href="     https://dalink.to/megabozz" target="_blank" class="btn-primary">Получить доступ <i class="fas fa-arrow-right"></i></a>
+    <section class="hero" id="hero">
+        <div class="hero-inner">
+            <div class="hero-panel grad-border float-anim">
+                <div class="status-badge" style="opacity: 1;">
+                    <span class="status-dot"></span> ONLINE — ACTIVE STATUS
+                </div>
+                <h1>Достигай большего.<br>Властвуй с <span data-text="MegaBoss.wtf">MegaBoss.wtf</span>.</h1>
+                <p>Премиум HWID SPOOFER для Rust с полным набором функций. Если ты ищешь максимум – ты нашёл его.</p>
+                <div class="hero-buttons">
+                    <a href="     https://dalink.to/megabozz" target="_blank" class="btn-primary">Получить доступ <i class="fas fa-arrow-right"></i></a>
+                    <a href="#" class="btn-outline" onclick="openRegisterModal(event)">Регистрация</a>
+                </div>
+            </div>
         </div>
         <div class="scroll-indicator visible" id="scrollIndicator">
             <div class="mouse"><div class="wheel"></div></div>
         </div>
     </section>
 
-    <div class="stats">
+    <!-- ===== СТАТИСТИКА ===== -->
+    <div class="stats reveal">
         <div class="stat-item"><span class="number" data-target="100">0</span><span class="label">активных пользователей</span></div>
         <div class="stat-item"><span class="number" data-target="99">0</span><span class="label">% uptime</span></div>
         <div class="stat-item"><span class="number" data-target="24">0</span><span class="label">24/7 поддержка</span></div>
         <div class="stat-item"><span class="number" data-target="0">0</span><span class="label">банов</span></div>
     </div>
 
-    <div class="features">
+    <!-- ===== ФИЧИ ===== -->
+    <div class="features reveal">
         <div class="feature-card"><i class="fas fa-shield-alt"></i><h3>Андетект</h3><p>Постоянные обновления под devblog.</p></div>
         <div class="feature-card"><i class="fas fa-bolt"></i><h3>Быстрый старт</h3><p>Минимальная нагрузка на систему.</p></div>
         <div class="feature-card"><i class="fas fa-sync-alt"></i><h3>Автообновление</h3><p>Всегда актуальные обновления.</p></div>
@@ -774,80 +1573,314 @@ body::before {
         <div class="feature-card"><i class="fas fa-credit-card"></i><h3>HWID Spoofer</h3><p>Обход железных банов.</p></div>
     </div>
 
+    <!-- ===== ТАРИФЫ ===== -->
     <section class="section" id="pricing">
-        <div class="section-header">
+        <div class="section-header reveal">
             <div class="section-label">Тарифы</div>
             <h2 class="section-title"><span class="gradient">Доступ к спуферу</span></h2>
         </div>
-        <div class="price-grid">
+        <div class="price-grid reveal">
             <div class="price-card">
                 <div class="duration">7 Дней</div>
                 <div class="price">150<span>₽</span></div>
-                <a href="     https://dalink.to/megabozz" target="_blank" class="price-btn">Купить</a>
+                <a href="#" onclick="openBuyModal(event, '7 Дней', 150)" class="price-btn">Купить</a>
             </div>
             <div class="price-card popular">
                 <div class="badge-better">выгодней</div>
                 <div class="duration">30 Дней</div>
                 <div class="price">300<span>₽</span></div>
-                <a href="     https://dalink.to/megabozz" target="_blank" class="price-btn">Купить</a>
+                <a href="#" onclick="openBuyModal(event, '30 Дней', 300)" class="price-btn">Купить</a>
             </div>
             <div class="price-card">
                 <div class="duration">90 Дней</div>
                 <div class="price">400<span>₽</span></div>
-                <a href="     https://dalink.to/megabozz" target="_blank" class="price-btn">Купить</a>
+                <a href="#" onclick="openBuyModal(event, '90 Дней', 400)" class="price-btn">Купить</a>
             </div>
             <div class="price-card">
                 <div class="duration">НАВСЕГДА</div>
                 <div class="price">500<span>₽</span></div>
-                <a href="     https://dalink.to/megabozz" target="_blank" class="price-btn">Купить</a>
+                <a href="#" onclick="openBuyModal(event, 'НАВСЕГДА', 500)" class="price-btn">Купить</a>
             </div>
         </div>
     </section>
 
-    <div class="cta-block">
+    <!-- ===== ПОДДЕРЖИВАЕМЫЕ ДЕВБЛОГИ (marquee) ===== -->
+    <section class="section" id="devblogs">
+        <div class="section-header reveal">
+            <div class="section-label">Поддержка</div>
+            <h2 class="section-title"><span class="gradient">Актуальные девблоги</span></h2>
+        </div>
+        <div class="marquee-wrap reveal">
+            <div class="marquee-track">
+                <span class="marquee-chip">DEV 196</span>
+                <span class="marquee-chip">DEV 217</span>
+                <span class="marquee-chip">DEV 240</span>
+                <span class="marquee-chip">DEV 246</span>
+                <span class="marquee-chip">DEV 247</span>
+                <span class="marquee-chip">DEV 248</span>
+                <span class="marquee-chip">DEV 261</span>
+                <span class="marquee-chip">DEV 265</span>
+                <span class="marquee-chip">DEV 266</span>
+                <span class="marquee-chip">DEV 276</span>
+                <span class="marquee-chip">DEV 285</span>
+                <span class="marquee-chip">DEV 286</span>
+                <span class="marquee-chip">DEV 300</span>
+                <span class="marquee-chip">DEV 308</span>
+                <!-- duplicate for seamless loop -->
+                <span class="marquee-chip">DEV 196</span>
+                <span class="marquee-chip">DEV 217</span>
+                <span class="marquee-chip">DEV 240</span>
+                <span class="marquee-chip">DEV 246</span>
+                <span class="marquee-chip">DEV 247</span>
+                <span class="marquee-chip">DEV 248</span>
+                <span class="marquee-chip">DEV 261</span>
+                <span class="marquee-chip">DEV 265</span>
+                <span class="marquee-chip">DEV 266</span>
+                <span class="marquee-chip">DEV 276</span>
+                <span class="marquee-chip">DEV 285</span>
+                <span class="marquee-chip">DEV 286</span>
+                <span class="marquee-chip">DEV 300</span>
+                <span class="marquee-chip">DEV 308</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ПРОЦЕСС (3 ШАГА) ===== -->
+    <section class="section" id="start">
+        <div class="section-header reveal">
+            <div class="section-label">Старт</div>
+            <h2 class="section-title"><span class="gradient">Начать за 3 шага</span></h2>
+        </div>
+        <div class="steps reveal">
+            <div class="step-card">
+                <div class="step-num">01</div>
+                <h3>Оплата</h3>
+                <p>Выберите тариф и оплатите удобным способом — моментально через DonationAlerts или напишите в Discord для оплаты картой/криптой.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">02</div>
+                <h3>Выдача доступа</h3>
+                <p>Ключ и инструкция приходят в течение пары минут. Лоадер скачивается в один клик.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">03</div>
+                <h3>Игра</h3>
+                <p>Запускаете, вводите ключ, настраиваете конфиг под себя. Облачные конфиги синхронизируют настройки.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="section" id="faq">
+        <div class="section-header reveal">
+            <div class="section-label">FAQ</div>
+            <h2 class="section-title"><span class="gradient">Частые вопросы</span></h2>
+        </div>
+        <div class="faq-grid reveal">
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Что такое HWID Spoofer?<span class="plus">+</span></button>
+                <div class="faq-a"><p>HWID Spoofer — это инструмент, который изменяет идентификаторы вашего железа, позволяя обойти блокировки по Hardware ID и избежать повторных банов.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Безопасно ли это?<span class="plus">+</span></button>
+                <div class="faq-a"><p>Да, мы используем продвинутые методы спуфинга, которые не детектятся античит-системами. Постоянные обновления гарантируют безопасность.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Как часто обновляется спуфер?<span class="plus">+</span></button>
+                <div class="faq-a"><p>Обновления выходят в течение 24 часов после выхода нового девблога. Для владельцев подписки они бесплатны и автоматические.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Что делать, если не запускается?<span class="plus">+</span></button>
+                <div class="faq-a"><p>Напишите в Discord megabro69 — техподдержка ответит быстро и поможет настроить под вашу систему.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <div class="cta-block reveal">
         <h2>Готов подняться на новый уровень?</h2>
         <p>Присоединяйся к сообществу MegaBoss.wtf и получи полный контроль над игрой.</p>
         <a href="https://discord.gg/ZaTfPgcAh3" target="_blank" class="btn-primary">Присоединиться <i class="fas fa-arrow-right"></i></a>
     </div>
+
+    <!-- ===== КОНТАКТЫ ===== -->
+    <section class="section" id="contact">
+        <div class="section-header reveal">
+            <div class="section-label">Связь</div>
+            <h2 class="section-title"><span class="gradient">Поддержка</span></h2>
+        </div>
+        <div class="contact-grid reveal">
+            <a href="#" onclick="copyDiscord(event)" class="contact-card">
+                <div class="contact-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"></path>
+                    </svg>
+                </div>
+                <div class="contact-info">
+                    <div class="label">Discord</div>
+                    <div class="value">megabro69</div>
+                </div>
+            </a>
+            <a href="https://www.donationalerts.com/r/megabro69" target="_blank" class="contact-card">
+                <div class="contact-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28" style="color:#f57c00;">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H8l4-6v4h3l-4 6z"/>
+                    </svg>
+                </div>
+                <div class="contact-info">
+                    <div class="label">DonationAlerts</div>
+                    <div class="value">MegaBro69</div>
+                </div>
+            </a>
+        </div>
+    </section>
 
     <footer class="footer">
         <span>© 2026 MegaBoss.wtf. Все права защищены.</span>
         <span>
             <a href="https://discord.gg/ZaTfPgcAh3">Discord</a>
             <a href="https://discord.gg/ZaTfPgcAh3">Telegram</a>
-            <a href="https://discord.gg/ZaTfPgcAh3">Политика</a>
+            <a href="#">Политика</a>
         </span>
     </footer>
 </div>
 
+<!-- ===== МОДАЛКА РЕГИСТРАЦИИ ===== -->
+<div class="register-modal" id="registerModal">
+    <div class="modal-content">
+        <div class="modal-icon"><span>M</span></div>
+        <h2>Создание аккаунта</h2>
+        <p class="sub">Введите данные для регистрации</p>
+        <form onsubmit="handleRegister(event)">
+            <div>
+                <label>Имя пользователя</label>
+                <input type="text" id="regUsername" required placeholder="Введите ник" minlength="2">
+            </div>
+            <div>
+                <label>Пароль</label>
+                <input type="password" id="regPassword" required placeholder="Минимум 6 символов" minlength="6">
+            </div>
+            <button type="submit" class="btn-submit">Зарегистрироваться</button>
+            <button type="button" class="btn-cancel" onclick="closeRegisterModal()">Отмена</button>
+        </form>
+    </div>
+</div>
+
+<!-- ===== АККАУНТ ПАНЕЛЬ ===== -->
+<div class="account-panel" id="accountPanel">
+    <div id="account-stars">
+        <canvas id="accountStarsCanvas"></canvas>
+    </div>
+    <div class="account-panel-header">
+        <h2>Личный кабинет</h2>
+        <button class="account-close" onclick="closeAccountPanel()">✕</button>
+    </div>
+    <div class="account-body">
+        <div class="account-avatar-wrapper">
+            <div class="account-avatar" id="accountAvatar" onclick="document.getElementById('avatarInput').click()">
+                <span id="avatarText">M</span>
+                <div class="change-avatar-hint">✎</div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarChange(event)">
+        </div>
+        <div class="account-name" id="accountDisplayName">Пользователь</div>
+
+        <div class="account-stats">
+            <div class="account-stat">
+                <div class="num active">●</div>
+                <span class="label">Статус</span>
+            </div>
+            <div class="account-stat">
+                <div class="num" style="color:var(--dim);">✕</div>
+                <span class="label">Подписка</span>
+            </div>
+        </div>
+
+        <div class="account-divider"></div>
+
+        <div class="account-menu">
+            <button class="account-menu-item" onclick="showToast('Настройки профиля')">
+                <span class="icon">⚙</span>
+                Настройки
+                <span class="arrow">→</span>
+            </button>
+            <button class="account-menu-item" onclick="showToast('Ваши подписки')">
+                <span class="icon">📦</span>
+                Подписки
+                <span class="arrow">→</span>
+            </button>
+            <button class="account-menu-item" onclick="showToast('История операций')">
+                <span class="icon">📜</span>
+                История
+                <span class="arrow">→</span>
+            </button>
+            <button class="account-menu-item danger" onclick="handleLogout()">
+                <span class="icon">🚪</span>
+                Выйти
+                <span class="arrow">→</span>
+            </button>
+        </div>
+    </div>
+    <div class="account-footer">MegaBoss.wtf</div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast">
+    <div class="toast-icon">✓</div>
+    <span id="toastMessage">Готово</span>
+</div>
+
+<!-- ===== МОДАЛКА ПОКУПКИ ===== -->
+<div id="buyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:10000;align-items:center;justify-content:center;">
+    <div style="background:linear-gradient(160deg,rgba(26,19,40,0.08) 0%,rgba(14,10,22,0.03) 100%);border:1px solid rgba(255,23,68,0.3);border-radius:20px;padding:40px;text-align:center;max-width:420px;width:90%;box-shadow:0 40px 80px -30px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.08) inset,0 1px 0 rgba(255,255,255,0.15) inset,inset 0 0 30px rgba(255,23,68,0.08);transform:scale(0.9) translateY(20px);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);">
+        <div style="margin-bottom:16px;">
+            <div style="width:64px;height:64px;margin:0 auto;background:rgba(255,23,68,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,23,68,0.3);">
+                <span style="font-size:28px;color:var(--red);font-family:var(--mono);font-weight:700;">M</span>
+            </div>
+        </div>
+        <h2 style="font-size:24px;font-weight:800;color:#fff;margin:0 0 6px;font-family:var(--mono);">Оформление покупки</h2>
+        <p style="color:rgba(255,255,255,0.5);font-size:14px;margin:0 0 28px;font-family:var(--mono);"><span id="buyPlan">30 Дней</span> — <span id="buyPrice" style="color:var(--red);font-weight:700;">300 ₽</span></p>
+        <div style="display:flex;gap:12px;">
+            <a href="#" onclick="event.preventDefault();navigator.clipboard.writeText('megabro69');closeBuyModal();showToast('Ник Discord скопирован');" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 16px;border:1px solid rgba(255,23,68,0.2);border-radius:16px;background:rgba(0,0,0,0.2);text-decoration:none;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.borderColor='rgba(255,23,68,0.5)';this.style.background='rgba(255,23,68,0.06)'" onmouseout="this.style.borderColor='rgba(255,23,68,0.2)';this.style.background='rgba(0,0,0,0.2)'">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" style="color:#5865F2;">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"></path>
+                </svg>
+                <div style="color:#fff;font-weight:600;font-size:14px;font-family:var(--mono);">Discord</div>
+                <div style="color:rgba(255,255,255,0.4);font-size:11px;font-family:var(--mono);">Скопировать ник</div>
+            </a>
+            <a href="https://www.donationalerts.com/r/megabro69" target="_blank" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 16px;border:1px solid rgba(255,23,68,0.2);border-radius:16px;background:rgba(0,0,0,0.2);text-decoration:none;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.borderColor='rgba(255,23,68,0.5)';this.style.background='rgba(255,23,68,0.06)'" onmouseout="this.style.borderColor='rgba(255,23,68,0.2)';this.style.background='rgba(0,0,0,0.2)'">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" style="color:#f57c00;">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H8l4-6v4h3l-4 6z"/>
+                </svg>
+                <div style="color:#fff;font-weight:600;font-size:14px;font-family:var(--mono);">DonationAlerts</div>
+                <div style="color:rgba(255,255,255,0.4);font-size:11px;font-family:var(--mono);">Моментальная покупка</div>
+            </a>
+        </div>
+        <button onclick="closeBuyModal()" style="margin-top:20px;padding:10px 32px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;background:transparent;color:rgba(255,255,255,0.5);font-weight:600;font-size:13px;cursor:pointer;font-family:var(--mono);">Отмена</button>
+    </div>
+</div>
+
 <script>
-// ========== МЕРЦАЮЩИЕ ПОЛОСКИ-ЗВЁЗДЫ ==========
-(function createTwinkleLines() {
+// ========== ЗВЁЗДЫ (статичные) ==========
+(function createTwinkleStars() {
     const field = document.getElementById('starField');
     if (!field) return;
-
-    const LINE_COUNT = 80;
-
-    for (let i = 0; i < LINE_COUNT; i++) {
-        const line = document.createElement('span');
-
-        // Ширина тонкая (0.6-1.8px), высота длинная (8-24px) — вертикальная полоска
-        const w = Math.random() * 1.2 + 0.6;
-        const h = Math.random() * 16 + 8;
-
-        line.style.width = w + 'px';
-        line.style.height = h + 'px';
-        line.style.left = Math.random() * 100 + '%';
-        line.style.top = Math.random() * 100 + '%';
-        line.style.animationDelay = (Math.random() * 4) + 's';
-        line.style.animationDuration = (2.5 + Math.random() * 3) + 's';
-        line.style.opacity = 0.2 + Math.random() * 0.8;
-
-        field.appendChild(line);
+    const STAR_COUNT = 60;
+    for (let i = 0; i < STAR_COUNT; i++) {
+        const star = document.createElement('span');
+        const size = Math.random() * 2 + 1;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = (Math.random() * 3) + 's';
+        star.style.animationDuration = (2 + Math.random() * 2.5) + 's';
+        star.style.opacity = 0.3 + Math.random() * 0.7;
+        field.appendChild(star);
     }
 })();
 
-// ========== CANVAS ЧАСТИЦЫ (медленно притягиваются к курсору) ==========
+// ========== CANVAS ЧАСТИЦЫ ==========
 const canvas = document.getElementById('stars-canvas');
 const ctx = canvas.getContext('2d');
 let width, height;
@@ -972,6 +2005,73 @@ resize();
 createStars();
 animateStars();
 
+// ========== ЗВЁЗДЫ В АККАУНТЕ ==========
+function initAccountStars() {
+    const canvas = document.getElementById('accountStarsCanvas');
+    const container = document.getElementById('account-stars');
+    if (!canvas || !container) return;
+    
+    canvas.width = container.offsetWidth || 400;
+    canvas.height = container.offsetHeight || window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    const STAR_COUNT = 80;
+
+    for (let i = 0; i < STAR_COUNT; i++) {
+        stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: Math.random() * 1.5 + 0.2,
+            speed: Math.random() * 0.3 + 0.02,
+            opacity: Math.random() * 0.5 + 0.1,
+            direction: Math.random() * 2 * Math.PI
+        });
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const star of stars) {
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+            ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+            ctx.fill();
+        }
+    }
+
+    function update() {
+        for (const star of stars) {
+            star.x += Math.cos(star.direction) * star.speed;
+            star.y += Math.sin(star.direction) * star.speed;
+            if (star.x < -10) star.x = canvas.width + 10;
+            if (star.x > canvas.width + 10) star.x = -10;
+            if (star.y < -10) star.y = canvas.height + 10;
+            if (star.y > canvas.height + 10) star.y = -10;
+        }
+    }
+
+    function animate() {
+        update();
+        draw();
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+        canvas.width = container.offsetWidth || 400;
+        canvas.height = container.offsetHeight || window.innerHeight;
+    });
+}
+
+setTimeout(initAccountStars, 100);
+
+// ========== КУРСОР ==========
+const glow = document.getElementById('cursorGlow');
+document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+});
+
 // ========== СЧЁТЧИКИ ==========
 const counters = document.querySelectorAll('.stat-item .number');
 counters.forEach(counter => {
@@ -1000,6 +2100,12 @@ counters.forEach(counter => {
     observer.observe(counter);
 });
 
+// ========== REVEAL ==========
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
 // ========== СТАТУС БЕЙДЖ ==========
 const statusMessages = ['UNDETECTED', 'ACTIVE', 'ONLINE', 'READY', 'SECURE'];
 const statusBadge = document.querySelector('.status-badge');
@@ -1027,6 +2133,199 @@ window.addEventListener('scroll', () => {
     } else {
         scrollIndicator.style.opacity = '0.6';
         scrollIndicator.style.bottom = '40px';
+    }
+});
+
+// ========== FAQ ==========
+function toggleFaq(btn) {
+    const item = btn.parentElement;
+    const ans = item.querySelector('.faq-a');
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.faq-a').style.maxHeight = '0';
+    });
+    if (!wasOpen) {
+        item.classList.add('open');
+        ans.style.maxHeight = ans.scrollHeight + 'px';
+    }
+}
+
+// ========== КОПИРОВАТЬ DISCORD ==========
+function copyDiscord(e) {
+    e.preventDefault();
+    navigator.clipboard.writeText('megabro69');
+    showToast('Ник Discord скопирован');
+}
+
+// ========== TOAST ==========
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMessage').textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ========== РЕГИСТРАЦИЯ ==========
+function openRegisterModal(event) {
+    if (event) event.preventDefault();
+    const modal = document.getElementById('registerModal');
+    modal.style.display = 'flex';
+    const content = modal.querySelector('.modal-content');
+    setTimeout(() => {
+        content.style.transform = 'scale(1) translateY(0)';
+    }, 50);
+    document.getElementById('regUsername').value = '';
+    document.getElementById('regPassword').value = '';
+}
+
+function closeRegisterModal() {
+    const modal = document.getElementById('registerModal');
+    const content = modal.querySelector('.modal-content');
+    content.style.transform = 'scale(0.9) translateY(20px)';
+    setTimeout(() => {
+        modal.style.display = 'none';
+        content.style.transform = 'scale(0.9) translateY(20px)';
+    }, 300);
+}
+
+function handleRegister(event) {
+    event.preventDefault();
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+
+    if (username.toLowerCase() === 'megabro69') {
+        showToast('Это имя занято. Выберите другое');
+        return;
+    }
+
+    if (!username || username.length < 2) {
+        showToast('Введите корректный ник (мин. 2 символа)');
+        return;
+    }
+    if (!password || password.length < 6) {
+        showToast('Пароль должен быть минимум 6 символов');
+        return;
+    }
+
+    closeRegisterModal();
+    openAccountPanelWithData(username);
+}
+
+// ========== АККАУНТ ==========
+let currentUser = null;
+let avatarDataUrl = null;
+
+function openAccountPanel(event) {
+    if (event) event.preventDefault();
+    if (currentUser) {
+        openAccountPanelWithData(currentUser);
+    } else {
+        showToast('Сначала зарегистрируйтесь');
+        openRegisterModal();
+    }
+}
+
+function openAccountPanelWithData(username) {
+    currentUser = username;
+    const panel = document.getElementById('accountPanel');
+    document.getElementById('accountDisplayName').textContent = username;
+    
+    if (avatarDataUrl) {
+        document.getElementById('accountAvatar').innerHTML = `<img src="${avatarDataUrl}" alt="avatar">`;
+    } else {
+        document.getElementById('accountAvatar').innerHTML = `<span id="avatarText">${username.charAt(0).toUpperCase()}</span><div class="change-avatar-hint">✎</div>`;
+    }
+    
+    panel.classList.add('open');
+    
+    setTimeout(initAccountStars, 200);
+    
+    showToast('Добро пожаловать, ' + username);
+}
+
+function closeAccountPanel() {
+    document.getElementById('accountPanel').classList.remove('open');
+}
+
+function handleLogout() {
+    closeAccountPanel();
+    currentUser = null;
+    avatarDataUrl = null;
+    showToast('Вы вышли из аккаунта');
+}
+
+// ========== АВАТАРКА ==========
+function handleAvatarChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        avatarDataUrl = e.target.result;
+        const avatar = document.getElementById('accountAvatar');
+        avatar.innerHTML = `<img src="${avatarDataUrl}" alt="avatar">`;
+        showToast('Аватарка обновлена');
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+}
+
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('accountPanel');
+    if (panel.classList.contains('open')) {
+        if (!panel.contains(e.target) && !e.target.closest('.header-nav') && !e.target.closest('#registerModal')) {
+            closeAccountPanel();
+        }
+    }
+});
+
+// ========== МОДАЛКА ПОКУПКИ ==========
+function openBuyModal(event, plan, price) {
+    event.preventDefault();
+    document.getElementById('buyPlan').textContent = plan;
+    document.getElementById('buyPrice').textContent = price + ' ₽';
+    const modal = document.getElementById('buyModal');
+    modal.style.display = 'flex';
+    const content = modal.querySelector('div');
+    setTimeout(() => {
+        content.style.transform = 'scale(1) translateY(0)';
+    }, 50);
+}
+
+function closeBuyModal() {
+    const modal = document.getElementById('buyModal');
+    const content = modal.querySelector('div');
+    content.style.transform = 'scale(0.9) translateY(20px)';
+    setTimeout(() => {
+        modal.style.display = 'none';
+        content.style.transform = 'scale(0.9) translateY(20px)';
+    }, 300);
+}
+
+document.getElementById('buyModal').addEventListener('click', function(e) {
+    if (e.target === this) closeBuyModal();
+});
+
+// ========== 3D TILT ==========
+document.querySelectorAll('.tilt').forEach(card => {
+    card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const rx = ((e.clientY - r.top) / r.height - .5) * -8;
+        const ry = ((e.clientX - r.left) / r.width - .5) * 8;
+        card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-10px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+    });
+});
+
+// ========== ESC ==========
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closeBuyModal();
+        closeRegisterModal();
+        closeAccountPanel();
     }
 });
 </script>
