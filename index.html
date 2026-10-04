@@ -553,9 +553,9 @@ body::before {
 /* ===== PRICING ===== */
 .price-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
-    max-width: 1100px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
@@ -1437,7 +1437,7 @@ body::before {
 @media(max-width: 1100px) {
     .price-grid {
         grid-template-columns: repeat(2, 1fr);
-        max-width: 600px;
+        max-width: 700px;
     }
     .steps {
         grid-template-columns: 1fr;
@@ -1581,6 +1581,11 @@ body::before {
         </div>
         <div class="price-grid reveal">
             <div class="price-card">
+                <div class="duration">1 День</div>
+                <div class="price">99<span>₽</span></div>
+                <a href="#" onclick="openBuyModal(event, '1 День', 99)" class="price-btn">Купить</a>
+            </div>
+            <div class="price-card">
                 <div class="duration">7 Дней</div>
                 <div class="price">150<span>₽</span></div>
                 <a href="#" onclick="openBuyModal(event, '7 Дней', 150)" class="price-btn">Купить</a>
@@ -1600,6 +1605,11 @@ body::before {
                 <div class="duration">НАВСЕГДА</div>
                 <div class="price">500<span>₽</span></div>
                 <a href="#" onclick="openBuyModal(event, 'НАВСЕГДА', 500)" class="price-btn">Купить</a>
+            </div>
+            <div class="price-card">
+                <div class="duration">АЛЬФА</div>
+                <div class="price">800<span>₽</span></div>
+                <a href="#" onclick="openBuyModal(event, 'АЛЬФА', 800)" class="price-btn">Купить</a>
             </div>
         </div>
     </section>
@@ -1626,6 +1636,7 @@ body::before {
                 <span class="marquee-chip">DEV 286</span>
                 <span class="marquee-chip">DEV 300</span>
                 <span class="marquee-chip">DEV 308</span>
+                <span class="marquee-chip">SnowRust</span>
                 <!-- duplicate for seamless loop -->
                 <span class="marquee-chip">DEV 196</span>
                 <span class="marquee-chip">DEV 217</span>
@@ -1641,6 +1652,7 @@ body::before {
                 <span class="marquee-chip">DEV 286</span>
                 <span class="marquee-chip">DEV 300</span>
                 <span class="marquee-chip">DEV 308</span>
+                <span class="marquee-chip">SnowRust</span>
             </div>
         </div>
     </section>
